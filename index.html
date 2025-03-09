@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Advanced Glassmorphism Navbar</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-blur: blur(15px);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.15);
+            --text-light: #ffffff;
+            --text-dark: #1a1a1a;
+            --accent: #00ffcc;
+            --bg-light: linear-gradient(135deg, #a8edea, #fed6e3);
+            --bg-dark: linear-gradient(135deg, #16222a, #3a6073);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            transition: background 0.5s ease;
+            min-height: 300vh; /* For scrolling */
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body.light {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        body.dark {
+            background: var(--bg-dark);
+            color: var(--text-light);
+        }
+
+        /* Parallax Background */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://source.unsplash.com/random/1920x1080?abstract') no-repeat center/cover;
+            z-index: -1;
+            transform: translateZ(0);
+            filter: blur(2px);
+            opacity: 0.3;
+        }
+
+        /* Scroll Progress */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 4px;
+            background: var(--accent);
+            z-index: 2000;
+            transition: width 0.1s ease;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        .cursor.hover {
+            transform: scale(2);
+        }
+
+        /* Glass Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border-bottom: var(--glass-border);
+            padding: 1.2rem 2rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, backdrop-filter 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .navbar.hidden {
+            transform: translateY(-100%);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-light);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            justify-self: end;
+            align-items: center;
+        }
+
+        .nav-links li {
+            position: relative;
+            margin-left: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a:focus {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* 3D Tilt Effect */
+        .tilt {
+            transition: transform 0.2s ease;
+            transform-style: preserve-3d;
+        }
+
+        /* Glass Mega Menu */
+        .mega-menu {
+            position: relative;
+        }
+
+        .mega-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            border-radius: 15px;
+            width: 600px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            opacity: 0;
+            transform: translateX(-50%) translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .mega-menu:hover .mega-content, .mega-menu:focus-within .mega-content {
+            display: grid;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .mega-content a {
+            padding: 0.6rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+        }
+
+        .mega-content h3 {
+            grid-column: span 2;
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Search */
+        .search-container {
+            position: relative;
+            margin-left: 2.5rem;
+        }
+
+        .search-input {
+            padding: 0.7rem 3rem 0.7rem 1.2rem;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            border-radius: 30px;
+            color: var(--text-light);
+            font-size: 1rem;
+            width: 200px;
+            transition: width 0.4s ease, background 0.3s ease;
+        }
+
+        .search-input:focus {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+        }
+
+        .search-icon, .voice-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        .search-icon {
+            right: 35px;
+        }
+
+        .voice-icon {
+            right: 10px;
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1001;
+        }
+
+        .suggestions div {
+            padding: 0.6rem 1.2rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .suggestions div:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            color: var(--text-light);
+            font-size: 1.5rem;
+            padding: 0.6rem;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 2.5rem;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(20deg);
+        }
+
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            color: var(--text-light);
+            font-size: 2rem;
+            padding: 0.6rem;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                grid-template-columns: auto auto;
+                padding: 1rem;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                right: -100%;
+                width: 300px;
+                height: 100vh;
+                background: var(--glass-bg);
+                backdrop-filter: var(--glass-blur);
+                border-left: var(--glass-border);
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 2rem;
+                transition: right 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                margin: 1.5rem 0;
+            }
+
+            .mega-content {
+                position: static;
+                width: 100%;
+                transform: none;
+                box-shadow: none;
+                background: transparent;
+                border: none;
+                backdrop-filter: none;
+                display: none;
+            }
+
+            .mega-menu.active .mega-content {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .search-container, .theme-toggle {
+                margin: 1.5rem 0 0 0;
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .search-input:focus {
+                width: 100%;
+            }
+        }
+
+        /* Content */
+        .content {
+            margin-top: 90px;
+            padding: 2rem;
+        }
+
+        section {
+            min-height: 100vh;
+            padding: 2rem;
+            scroll-margin-top: 90px;
+        }
+    </style>
+</head>
+<body class="light">
+    <!-- Parallax Background -->
+    <div class="parallax-bg"></div>
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress"></div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="logo tilt" tabindex="0">GlassX</div>
+        <ul class="nav-links">
+            <li><a href="#home" class="tilt" aria-label="Home">Home</a></li>
+            <li class="mega-menu" tabindex="0">
+                <a href="#services" class="tilt" aria-label="Services">Services</a>
+                <div class="mega-content" role="menu">
+                    <h3>Our Expertise</h3>
+                    <a href="#web-dev" class="tilt" role="menuitem">Web Development</a>
+                    <a href="#mobile-dev" class="tilt" role="menuitem">Mobile Apps</a>
+                    <a href="#design" class="tilt" role="menuitem">UI/UX Design</a>
+                    <a href="#cloud" class="tilt" role="menuitem">Cloud Solutions</a>
+                </div>
+            </li>
+            <li><a href="#about" class="tilt" aria-label="About">About</a></li>
+            <li><a href="#contact" class="tilt" aria-label="Contact">Contact</a></li>
+            <li class="search-container">
+                <input type="text" class="search-input tilt" placeholder="Search or say..." aria-label="Search">
+                <span class="search-icon tilt" aria-hidden="true">🔍</span>
+                <span class="voice-icon tilt" aria-label="Voice search">🎤</span>
+                <div class="suggestions" role="listbox"></div>
+            </li>
+            <li><button class="theme-toggle tilt" aria-label="Toggle theme">🌙</button></li>
+        </ul>
+        <button class="hamburger tilt" aria-label="Toggle menu">☰</button>
+    </nav>
+
+    <!-- Content -->
+    <div class="content">
+        <section id="home"><h1>Home</h1><p>Experience the future of navigation.</p></section>
+        <section id="services"><h1>Services</h1><p>Advanced solutions await.</p></section>
+        <section id="about"><h1>About</h1><p>Discover our story.</p></section>
+        <section id="contact"><h1>Contact</h1><p>Reach out to us.</p></section>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const body = document.body;
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.classList.add(savedTheme);
+        themeToggle.textContent = savedTheme === 'light' ? '🌙' : '☀';
+
+        themeToggle.addEventListener('click', () => {
+            const isLight = body.classList.contains('light');
+            body.classList.toggle('light', !isLight);
+            body.classList.toggle('dark', isLight);
+            localStorage.setItem('theme', isLight ? 'dark' : 'light');
+            themeToggle.textContent = isLight ? '☀' : '🌙';
+        });
+
+        // Hamburger Menu
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+            hamburger.setAttribute('aria-expanded', navLinks.classList.contains('active'));
+        });
+
+        // Mega Menu Toggle on Mobile
+        document.querySelectorAll('.mega-menu').forEach(menu => {
+            menu.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    menu.classList.toggle('active');
+                }
+            });
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    document.querySelector(href).scrollIntoView({ behavior: 'smooth' });
+                    if (window.innerWidth <= 768) {
+                        navLinks.classList.remove('active');
+                        hamburger.textContent = '☰';
+                    }
+                }
+            });
+        });
+
+        // Scroll Progress & Dynamic Blur
+        const progressBar = document.querySelector('.scroll-progress');
+        const navbar = document.querySelector('.navbar');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / scrollHeight) * 100;
+            progressBar.style.width = `${scrollPercent}%`;
+
+            // Dynamic blur based on scroll
+            const blurValue = Math.min(15, 5 + scrollTop / 50);
+            navbar.style.backdropFilter = `blur(${blurValue}px)`;
+
+            // Hide navbar on scroll down
+            if (scrollTop > lastScroll && scrollTop > 100) {
+                navbar.classList.add('hidden');
+            } else {
+                navbar.classList.remove('hidden');
+            }
+            lastScroll = scrollTop;
+
+            // Parallax effect
+            document.querySelector('.parallax-bg').style.transform = `translateY(${scrollTop * 0.5}px)`;
+        });
+
+        // 3D Tilt Effect
+        document.querySelectorAll('.tilt').forEach(el => {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const tiltX = (y - centerY) / 10;
+                const tiltY = (centerX - x) / 10;
+                el.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+            });
+
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            });
+        });
+
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.clientX - 10}px`;
+            cursor.style.top = `${e.clientY - 10}px`;
+        });
+
+        document.querySelectorAll('.tilt, a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // Search with Voice
+        const searchInput = document.querySelector('.search-input');
+        const suggestionsBox = document.querySelector('.suggestions');
+        const voiceIcon = document.querySelector('.voice-icon');
+        const searchItems = [
+            'Web Development', 'Mobile Apps', 'UI/UX Design', 'Cloud Solutions', 
+            'About Us', 'Contact Info', 'Glassmorphism'
+        ];
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            suggestionsBox.innerHTML = '';
+            if (query) {
+                const filtered = searchItems.filter(item => item.toLowerCase().includes(query));
+                filtered.forEach(item => {
+                    const div = document.createElement('div');
+                    div.textContent = item;
+                    div.setAttribute('role', 'option');
+                    div.addEventListener('click', () => {
+                        searchInput.value = item;
+                        suggestionsBox.style.display = 'none';
+                        const sectionId = item.toLowerCase().replace(/\s+/g, '-');
+                        const section = document.getElementById(sectionId) || document.querySelector(`#${sectionId.split('-')[0]}`);
+                        if (section) section.scrollIntoView({ behavior: 'smooth' });
+                    });
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = filtered.length ? 'block' : 'none';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        // Voice Search
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            voiceIcon.addEventListener('click', () => {
+                recognition.start();
+                voiceIcon.textContent = '🎙️';
+            });
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                searchInput.value = transcript;
+                searchInput.dispatchEvent(new Event('input'));
+                voiceIcon.textContent = '🎤';
+            };
+
+            recognition.onerror = () => {
+                voiceIcon.textContent = '🎤';
+                alert('Voice recognition failed. Please try again.');
+            };
+
+            recognition.onend = () => {
+                voiceIcon.textContent = '🎤';
+            };
+        } else {
+            voiceIcon.style.display = 'none';
+        }
+
+        // Accessibility
+        document.querySelectorAll('.mega-menu').forEach(menu => {
+            menu.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    menu.classList.toggle('active');
+                }
+            });
+        });
+
+        // Resize Handler
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                navLinks.classList.remove('active');
+                hamburger.textContent = '☰';
+            }
+        });
+    </script>
+</body>
+</html>
